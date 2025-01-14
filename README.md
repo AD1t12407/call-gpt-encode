@@ -6,7 +6,7 @@ Twilio gives you a superpower called [Media Streams](https://twilio.com/media-st
 
 This app serves as a demo exploring two services:
 - [Deepgram](https://deepgram.com/) for Speech to Text and Text to Speech
-This fork uses smallest.ai for text to speech instead
+- This fork uses smallest.ai for text to speech instead
 - [OpenAI](https://openai.com) for GPT prompt completion
 
 These service combine to create a voice application that is remarkably better at transcribing, understanding, and speaking than traditional IVR systems.
