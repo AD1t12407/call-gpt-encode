@@ -1,11 +1,12 @@
 # Call GPT: Generative AI Phone Calling
 
-Wouldn't it be neat if you could build an app that allowed you to chat with ChatGPT on the phone?
+
 
 Twilio gives you a superpower called [Media Streams](https://twilio.com/media-streams). Media Streams provides a Websocket connection to both sides of a phone call. You can get audio streamed to you, process it, and send audio back.
 
 This app serves as a demo exploring two services:
 - [Deepgram](https://deepgram.com/) for Speech to Text and Text to Speech
+This fork uses smallest.ai for text to speech instead
 - [OpenAI](https://openai.com) for GPT prompt completion
 
 These service combine to create a voice application that is remarkably better at transcribing, understanding, and speaking than traditional IVR systems.
