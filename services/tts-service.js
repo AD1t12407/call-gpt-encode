@@ -1,51 +1,30 @@
 require('dotenv').config();
-const { Buffer } = require('node:buffer');
 const EventEmitter = require('events');
-const fetch = require('node-fetch');
+const axios = require('axios');
 
 class TextToSpeechService extends EventEmitter {
   constructor() {
     super();
-    this.nextExpectedIndex = 0;
-    this.speechBuffer = {};
+    if (!process.env.SMALLEST_AI_API_KEY) {
+      throw new Error('SMALLEST_AI_API_KEY is not defined in environment variables.');
+    }
   }
 
-  async generate(gptReply, interactionCount) {
+  async generate(callSid, gptReply, interactionCount) {
     const { partialResponseIndex, partialResponse } = gptReply;
-
-    if (!partialResponse) { return; }
+    if (!partialResponse) return;
 
     try {
-      const response = await fetch(
-        `https://api.deepgram.com/v1/speak?model=${process.env.VOICE_MODEL}&encoding=mulaw&sample_rate=8000&container=none`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Token ${process.env.DEEPGRAM_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            text: partialResponse,
-          }),
-        }
+      const response = await axios.post(
+        'https://api.smallest.ai/tts',
+        { text: partialResponse, voice: 'en-US' }, // Adjust voice dynamically if needed
+        { headers: { Authorization: `Bearer ${process.env.SMALLEST_AI_API_KEY}` } }
       );
 
-      if (response.status === 200) {
-        try {
-          const blob = await response.blob();
-          const audioArrayBuffer = await blob.arrayBuffer();
-          const base64String = Buffer.from(audioArrayBuffer).toString('base64');
-          this.emit('speech', partialResponseIndex, base64String, partialResponse, interactionCount);
-        } catch (err) {
-          console.log(err);
-        }
-      } else {
-        console.log('Deepgram TTS error:');
-        console.log(response);
-      }
-    } catch (err) {
-      console.error('Error occurred in TextToSpeech service');
-      console.error(err);
+      const base64Audio = response.data.audio;
+      this.emit('speech', callSid, partialResponseIndex, base64Audio, partialResponse, interactionCount);
+    } catch (error) {
+      console.error('Error in TTS generation:', error.response?.data || error.message);
     }
   }
 }
